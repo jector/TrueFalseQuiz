@@ -3,8 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TrueFalseQuiz.MainPage">
 
-    <ScrollView>
+    <Grid>
         <VerticalStackLayout Padding="20" Spacing="25" VerticalOptions="Center">
+
+            <Grid.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+            </Grid.GestureRecognizers>
 
             <Image
                 x:Name="QuestionImage"
@@ -12,6 +16,7 @@
                 Aspect="AspectFit"
                 WidthRequest="300"
                 HorizontalOptions="Center" />
+            
 
             <Label
             x:Name="QuestionLabel"
@@ -38,6 +43,7 @@
             HorizontalOptions="Center" />
 
         </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 
+    
 </ContentPage>

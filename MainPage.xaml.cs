@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
+using System;
 using System.Threading.Tasks;
 
 
@@ -7,17 +8,17 @@ namespace TrueFalseQuiz
     public partial class MainPage : ContentPage
     {
         private string[] _questions = {
-        "Spain has one official language.",
-        "Spain’s national anthem has no words.",
-        "Spaniards eat TACOS.",
-        "Spain is below of USA.",
-        "Spain is a democracy"
-
+            "Spain has one official language.",
+            "Spain’s national anthem has no words.",
+            "Spaniards eat TACOS.",
+            "Spain is below of USA.",
+            "Spain is a democracy"
         };
         private bool[] _answers = { false, true, false, false, true };
-        private string[] _imageFilenames = { "talk.jpg", "himno.jpg", "tacos.jpg", "america.jpg", "democracy.jpg" }; // Add your image filenames here
+        private string[] _imageFilenames = { "talk.jpg", "himno.jpg", "tacos.jpg", "america.jpg", "democracy.jpg" };
         private int _currentQuestionIndex = 0;
         private int _score = 0;
+        private double _totalPanX = 0; // To track the total horizontal pan
 
         public MainPage()
         {
@@ -32,7 +33,6 @@ namespace TrueFalseQuiz
                 QuestionLabel.Text = _questions[_currentQuestionIndex];
                 QuestionImage.Source = ImageSource.FromFile(_imageFilenames[_currentQuestionIndex]);
                 AnswerLabel.Text = "";
-                
 
                 TrueButton.IsVisible = true;
                 FalseButton.IsVisible = true;
@@ -48,17 +48,17 @@ namespace TrueFalseQuiz
             }
         }
 
-        private async void OnTrueButtonClicked(object sender, EventArgs e) // Note the 'async' keyword
+        private async void OnTrueButtonClicked(object sender, EventArgs e)
         {
-            await CheckAnswer(true); // Note the 'await' keyword
+            await CheckAnswer(true);
         }
 
-        private async void OnFalseButtonClicked(object sender, EventArgs e) // Note the 'async' keyword
+        private async void OnFalseButtonClicked(object sender, EventArgs e)
         {
-            await CheckAnswer(false); // Note the 'await' keyword
+            await CheckAnswer(false);
         }
 
-        private async Task CheckAnswer(bool userAnswer) // Note the 'async Task' return type
+        private async Task CheckAnswer(bool userAnswer)
         {
             bool correctAnswer = _answers[_currentQuestionIndex];
             if (_currentQuestionIndex < _answers.Length)
@@ -76,11 +76,42 @@ namespace TrueFalseQuiz
                 FalseButton.IsVisible = false;
 
                 _currentQuestionIndex++;
-                // Introduce a delay of 2 seconds (2000 milliseconds)
                 await Task.Delay(2000);
 
                 LoadQuestion();
             }
+        }
+
+        private async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        {
+            if (_currentQuestionIndex < _questions.Length && TrueButton.IsVisible) // Only allow swipe if a question is active and buttons are visible
+            {
+                _totalPanX += e.TotalX;
+
+                if (e.StatusType == GestureStatus.Completed) // Corrected from 'e.State' to 'e.StatusType' and replaced 'GestureRecognizerState.Ended' with 'GestureStatus.Completed'
+                {
+                    if (_totalPanX > 50) // Swiped right (adjust threshold as needed)
+                    {
+                        await CheckAnswer(true);
+                        ResetPan();
+                    }
+                    else if (_totalPanX < -50) // Swiped left (adjust threshold as needed)
+                    {
+                        await CheckAnswer(false);
+                        ResetPan();
+                    }
+                    else
+                    {
+                        // Optional: Add some visual feedback if the swipe wasn't significant enough
+                        ResetPan();
+                    }
+                }
+            }
+        }
+
+        private void ResetPan()
+        {
+            _totalPanX = 0;
         }
     }
 }
