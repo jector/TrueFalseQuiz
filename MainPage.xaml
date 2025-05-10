@@ -22,6 +22,7 @@
             x:Name="QuestionLabel"
             Text="The capital of France is Paris. True or False?"
             FontSize="20"
+            SemanticProperties.Description ="The capital of France is Paris. True or False?"
             HorizontalOptions="Center" />
 
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">

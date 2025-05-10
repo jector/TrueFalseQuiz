@@ -1,19 +1,14 @@
 ﻿using Microsoft.Maui.Controls;
 using System;
 using System.Threading.Tasks;
+using TrueFalseQuiz.Resources.Strings;
 
 
 namespace TrueFalseQuiz
 {
     public partial class MainPage : ContentPage
     {
-        private string[] _questions = {
-            "Spain has one official language.",
-            "Spain’s national anthem has no words.",
-            "Spaniards eat TACOS.",
-            "Spain is below of USA.",
-            "Spain is a democracy"
-        };
+        private string[] _questionKeys = { "QuestionOne", "QuestionTwo", "QuestionThree", "QuestionFour", "QuestionFive" }; // Use keys instead of hardcoded strings
         private bool[] _answers = { false, true, false, false, true };
         private string[] _imageFilenames = { "talk.jpg", "himno.jpg", "tacos.jpg", "america.jpg", "democracy.jpg" };
         private int _currentQuestionIndex = 0;
@@ -28,20 +23,23 @@ namespace TrueFalseQuiz
 
         private void LoadQuestion()
         {
-            if (_currentQuestionIndex < _questions.Length)
+            if (_currentQuestionIndex < _questionKeys.Length)
             {
-                QuestionLabel.Text = _questions[_currentQuestionIndex];
+                QuestionLabel.Text = AppResources.ResourceManager.GetString(_questionKeys[_currentQuestionIndex]); // Load from resources
                 QuestionImage.Source = ImageSource.FromFile(_imageFilenames[_currentQuestionIndex]);
                 AnswerLabel.Text = "";
+
+                TrueButton.Text = AppResources.TrueButtonText; // Localize button text
+                FalseButton.Text = AppResources.FalseButtonText; // Localize button text
 
                 TrueButton.IsVisible = true;
                 FalseButton.IsVisible = true;
             }
             else
             {
-                QuestionLabel.Text = "Quiz finished!";
+                QuestionLabel.Text = AppResources.QuizFinishedText; // Localize "Quiz finished!"
                 QuestionImage.Source = null;
-                AnswerLabel.Text = $"Your final score is: {_score} out of {_questions.Length}";
+                AnswerLabel.Text = string.Format(AppResources.FinalScore, _score, _questionKeys.Length); // Localize and format the final score
 
                 TrueButton.IsVisible = false;
                 FalseButton.IsVisible = false;
@@ -63,6 +61,9 @@ namespace TrueFalseQuiz
             bool correctAnswer = _answers[_currentQuestionIndex];
             if (_currentQuestionIndex < _answers.Length)
             {
+                string correctText = correctAnswer ? AppResources.TrueButtonText : AppResources.FalseButtonText; // Localize the correct answer text
+                string userAnswerText = userAnswer ? AppResources.TrueButtonText : AppResources.FalseButtonText;   // Localize the user's answer text
+
                 if (userAnswer == _answers[_currentQuestionIndex])
                 {
                     AnswerLabel.Text = $"Correct! The answer is: {correctAnswer}";
@@ -84,7 +85,7 @@ namespace TrueFalseQuiz
 
         private async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
         {
-            if (_currentQuestionIndex < _questions.Length && TrueButton.IsVisible) // Only allow swipe if a question is active and buttons are visible
+            if (_currentQuestionIndex < _questionKeys.Length && TrueButton.IsVisible) // Only allow swipe if a question is active and buttons are visible
             {
                 _totalPanX += e.TotalX;
 
